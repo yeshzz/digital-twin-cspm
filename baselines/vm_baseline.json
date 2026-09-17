@@ -1,0 +1,11 @@
+{
+    "resource_type": "VM_Instance",
+    "description": "Secure baseline for Virtual Machine",
+    "parameters": {
+        "public_ip_exposed": false,
+        "os_patched": true,
+        "monitoring_enabled": true,
+        "encryption_at_rest": true,
+        "backup_enabled": true
+    }
+}

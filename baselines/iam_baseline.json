@@ -1,0 +1,11 @@
+{
+    "resource_type": "IAM_Role",
+    "description": "Secure baseline for AWS IAM Role",
+    "parameters": {
+        "admin_access": false,
+        "mfa_enabled": true,
+        "access_key_age_days": 90,
+        "unused_credentials_removed": true,
+        "least_privilege": true
+    }
+}

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin — Cloud Security Posture & Drift Detection</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #060d1f; color: #e0e0e0; overflow-x: hidden; }
+
+        .header { background: linear-gradient(135deg, #0a1628, #0d1f3c); padding: 18px 20px; text-align: center; border-bottom: 1px solid #1a3a6a; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: -100%; width: 300%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,180,255,0.03), transparent); animation: headershine 4s infinite; }
+        @keyframes headershine { 0% { left: -100%; } 100% { left: 100%; } }
+        .header h1 { color: #00c8ff; font-size: 1.4em; font-weight: 600; letter-spacing: 1px; }
+        .header p { color: #5a8ab0; margin-top: 4px; font-size: 0.85em; }
+
+        /* CLOUD CANVAS */
+        .cloud-canvas { width: 100%; height: 380px; position: relative; background: radial-gradient(ellipse at 50% 60%, #0a1e3d 0%, #060d1f 70%); overflow: hidden; border-bottom: 1px solid #0a2040; }
+
+        /* Stars */
+        .stars { position: absolute; inset: 0; }
+        .star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: twinkle var(--dur, 3s) infinite var(--delay, 0s); opacity: 0; }
+        @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: var(--bright, 0.6); } }
+
+        /* Cloud nodes */
+        .cloud-node { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: transform 0.3s; }
+        .cloud-node:hover { transform: scale(1.1); }
+        .node-orb { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6em; position: relative; border: 2px solid; transition: all 0.5s; }
+        .node-orb::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid; opacity: 0.3; animation: orbit-pulse 2s infinite; }
+        .node-orb::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; border: 1px dashed; opacity: 0.15; animation: orbit-pulse 3s infinite reverse; }
+        @keyframes orbit-pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.5; } }
+
+        .node-orb.secure { background: radial-gradient(circle at 35% 35%, #0d3d2a, #061a12); border-color: #00cc66; box-shadow: 0 0 20px rgba(0,204,102,0.3); }
+        .node-orb.secure::before { border-color: #00cc66; }
+        .node-orb.secure::after { border-color: #00cc66; }
+        .node-orb.critical { background: radial-gradient(circle at 35% 35%, #3d0d0d, #1a0606); border-color: #ff4444; box-shadow: 0 0 25px rgba(255,68,68,0.5); animation: danger-pulse 0.8s infinite; }
+        .node-orb.critical::before { border-color: #ff4444; }
+        .node-orb.critical::after { border-color: #ff4444; }
+        @keyframes danger-pulse { 0%, 100% { box-shadow: 0 0 20px rgba(255,68,68,0.4); } 50% { box-shadow: 0 0 40px rgba(255,68,68,0.8), 0 0 60px rgba(255,68,68,0.3); } }
+        .node-orb.high { background: radial-gradient(circle at 35% 35%, #3d2a0d, #1a1206); border-color: #ff8800; box-shadow: 0 0 20px rgba(255,136,0,0.4); }
+        .node-orb.medium { background: radial-gradient(circle at 35% 35%, #3d3d0d, #1a1a06); border-color: #ffdd00; box-shadow: 0 0 20px rgba(255,221,0,0.3); }
+
+        .node-label { font-size: 0.72em; color: #7ab0d0; font-weight: 600; letter-spacing: 0.5px; text-align: center; }
+        .node-badge { font-size: 0.6em; padding: 2px 7px; border-radius: 10px; font-weight: 700; letter-spacing: 0.5px; }
+        .badge-secure { background: rgba(0,204,102,0.15); color: #00cc66; border: 1px solid rgba(0,204,102,0.3); }
+        .badge-critical { background: rgba(255,68,68,0.2); color: #ff4444; border: 1px solid rgba(255,68,68,0.4); }
+        .badge-high { background: rgba(255,136,0,0.15); color: #ff8800; border: 1px solid rgba(255,136,0,0.3); }
+        .badge-medium { background: rgba(255,221,0,0.1); color: #ffdd00; border: 1px solid rgba(255,221,0,0.2); }
+
+        /* SVG connections */
+        .connections { position: absolute; inset: 0; pointer-events: none; }
+        .connection-line { stroke-width: 1.5; fill: none; stroke-dasharray: 6,4; animation: dash-flow 2s linear infinite; opacity: 0.5; }
+        .connection-line.active { opacity: 1; stroke-width: 2; }
+        @keyframes dash-flow { to { stroke-dashoffset: -20; } }
+
+        /* Data packets */
+        .packet { position: absolute; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; }
+        .packet.secure-pkt { background: #00cc66; box-shadow: 0 0 8px #00cc66; }
+        .packet.danger-pkt { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+
+        /* Central hub */
+        .central-hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .hub-ring { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 35% 35%, #0d1f3c, #060d1f); border: 2px solid #0066aa; box-shadow: 0 0 30px rgba(0,100,200,0.3), inset 0 0 20px rgba(0,80,160,0.1); position: relative; }
+        .hub-ring::before { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 1px solid rgba(0,150,255,0.2); animation: hub-rotate 8s linear infinite; }
+        .hub-ring::after { content: ''; position: absolute; inset: -20px; border-radius: 50%; border: 1px dashed rgba(0,100,200,0.15); animation: hub-rotate 12s linear infinite reverse; }
+        @keyframes hub-rotate { to { transform: rotate(360deg); } }
+        .hub-text { text-align: center; z-index: 1; }
+        .hub-icon { font-size: 1.8em; display: block; }
+        .hub-label { font-size: 0.55em; color: #4a90c0; letter-spacing: 1px; font-weight: 600; }
+        .hub-score { font-size: 1.1em; font-weight: 700; }
+        .hub-score.green { color: #00cc66; }
+        .hub-score.orange { color: #ff8800; }
+        .hub-score.red { color: #ff4444; }
+
+        /* Scan line animation */
+        .scan-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, rgba(0,180,255,0.6), transparent); animation: scan 4s linear infinite; opacity: 0.4; top: 0; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* Legend */
+        .cloud-legend { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 16px; font-size: 0.65em; color: #4a7090; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Status bar */
+        .status-bar { background: #08152a; border-bottom: 1px solid #0a2040; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75em; }
+        .status-item { display: flex; align-items: center; gap: 6px; color: #4a7090; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; animation: blink 2s infinite; }
+        .status-dot.active { background: #00cc66; }
+        .status-dot.scanning { background: #00c8ff; }
+        .status-dot.alert { background: #ff4444; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* MAIN CONTENT */
+        .container { max-width: 1100px; margin: 0 auto; padding: 16px 20px; }
+
+        .score-card { background: linear-gradient(135deg, #0a1628, #0d1f3c); border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 16px; border: 1px solid #1a3a6a; }
+        .score-number { font-size: 4.5em; font-weight: 700; line-height: 1; }
+        .score-number.green { color: #00cc66; text-shadow: 0 0 30px rgba(0,204,102,0.4); }
+        .score-number.orange { color: #ff8800; text-shadow: 0 0 30px rgba(255,136,0,0.4); }
+        .score-number.red { color: #ff4444; text-shadow: 0 0 30px rgba(255,68,68,0.4); }
+        .score-label { color: #5a8ab0; margin-top: 4px; font-size: 0.9em; }
+        .risk-level { font-size: 1.3em; font-weight: 600; margin-top: 6px; }
+        .risk-level.green { color: #00cc66; }
+        .risk-level.orange { color: #ff8800; }
+        .risk-level.red { color: #ff4444; }
+        .timestamp { color: #3a5a7a; font-size: 0.8em; margin-top: 6px; }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+        .summary-card { background: #0a1628; border-radius: 10px; padding: 16px; text-align: center; border: 1px solid #1a3050; }
+        .summary-card.critical { border-color: rgba(255,68,68,0.4); }
+        .summary-card.high { border-color: rgba(255,136,0,0.4); }
+        .summary-card.medium { border-color: rgba(255,221,0,0.3); }
+        .summary-number { font-size: 2.2em; font-weight: 700; color: #00c8ff; }
+        .summary-label { color: #4a7090; font-size: 0.8em; margin-top: 4px; }
+
+        .panel { background: #0a1628; border-radius: 12px; padding: 18px; margin-bottom: 16px; border: 1px solid #1a3050; }
+        .panel h2 { color: #00c8ff; margin-bottom: 14px; font-size: 1em; font-weight: 600; }
+
+        .scenario-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn { padding: 9px 14px; border: none; border-radius: 7px; cursor: pointer; font-weight: 600; font-size: 0.82em; transition: all 0.2s; letter-spacing: 0.3px; }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
+        .btn:active { transform: translateY(0); }
+        .btn.critical { background: linear-gradient(135deg, #cc2222, #ff4444); color: white; }
+        .btn.high { background: linear-gradient(135deg, #cc6600, #ff8800); color: white; }
+        .btn.medium { background: linear-gradient(135deg, #aa9900, #ffdd00); color: #1a1a00; }
+        .btn.secure { background: linear-gradient(135deg, #008844, #00cc66); color: white; }
+        .btn-scan { background: linear-gradient(135deg, #0066aa, #00c8ff); color: white; padding: 13px 40px; border: none; border-radius: 9px; font-size: 1em; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; }
+        .btn-scan:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+        .drift-item { background: #060d1f; border-radius: 8px; padding: 13px; margin-bottom: 8px; border-left: 3px solid #333; }
+        .drift-item.critical { border-left-color: #ff4444; }
+        .drift-item.high { border-left-color: #ff8800; }
+        .drift-item.medium { border-left-color: #ffdd00; }
+        .drift-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+        .severity-badge { padding: 2px 8px; border-radius: 5px; font-size: 0.75em; font-weight: 700; }
+        .severity-badge.critical { background: rgba(255,68,68,0.2); color: #ff4444; }
+        .severity-badge.high { background: rgba(255,136,0,0.15); color: #ff8800; }
+        .severity-badge.medium { background: rgba(255,221,0,0.1); color: #ffdd00; }
+        .resource-id { color: #00c8ff; font-weight: 600; font-size: 0.9em; }
+        .drift-detail { color: #5a8ab0; font-size: 0.82em; line-height: 1.6; }
+        .no-drifts { color: #00cc66; text-align: center; padding: 20px; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🛡 Digital Twin — Cloud Security Posture & Drift Detection</h1>
+    <p>IIIT Trichy Funded Research Project &nbsp;|&nbsp; Researcher: Yashaswini C</p>
+</div>
+
+<!-- ANIMATED CLOUD CANVAS -->
+<div class="cloud-canvas" id="cloudCanvas">
+    <div class="scan-line"></div>
+    <div class="stars" id="stars"></div>
+
+    <!-- SVG connections layer -->
+    <svg class="connections" id="connections" width="100%" height="100%"></svg>
+
+    <!-- Central Detection Hub -->
+    <div class="central-hub">
+        <div class="hub-ring">
+            <div class="hub-text">
+                <span class="hub-icon">🛡</span>
+                <span class="hub-label">TWIN ENGINE</span>
+                <span class="hub-score green" id="hub-score">100</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloud Resource Nodes -->
+    <div class="cloud-node" id="node-s3" style="left:12%; top:20%">
+        <div class="node-orb secure" id="orb-s3">🪣</div>
+        <div class="node-label">S3 BUCKET</div>
+        <div class="node-badge badge-secure" id="badge-s3">SECURE</div>
+    </div>
+
+    <div class="cloud-node" id="node-iam" style="right:12%; top:20%">
+        <div class="node-orb secure" id="orb-iam">👤</div>
+        <div class="node-label">IAM ROLE</div>
+        <div class="node-badge badge-secure" id="badge-iam">SECURE</div>
+    </div>
+
+    <div class="cloud-node" id="node-sg" style="left:12%; bottom:22%">
+        <div class="node-orb secure" id="orb-sg">🔥</div>
+        <div class="node-label">SECURITY GROUP</div>
+        <div class="node-badge badge-secure" id="badge-sg">SECURE</div>
+    </div>
+
+    <div class="cloud-node" id="node-vm" style="right:12%; bottom:22%">
+        <div class="node-orb secure" id="orb-vm">💻</div>
+        <div class="node-label">VM INSTANCE</div>
+        <div class="node-badge badge-secure" id="badge-vm">SECURE</div>
+    </div>
+
+    <!-- Digital Twin nodes (lighter versions) -->
+    <div class="cloud-node" id="twin-s3" style="left:26%; top:15%">
+        <div class="node-orb secure" id="twin-orb-s3" style="width:46px;height:46px;font-size:1.1em;opacity:0.6;border-style:dashed">🪣</div>
+        <div class="node-label" style="font-size:0.6em;color:#3a6080">S3 TWIN</div>
+    </div>
+
+    <div class="cloud-node" id="twin-iam" style="right:26%; top:15%">
+        <div class="node-orb secure" id="twin-orb-iam" style="width:46px;height:46px;font-size:1.1em;opacity:0.6;border-style:dashed">👤</div>
+        <div class="node-label" style="font-size:0.6em;color:#3a6080">IAM TWIN</div>
+    </div>
+
+    <div class="cloud-node" id="twin-sg" style="left:26%; bottom:17%">
+        <div class="node-orb secure" id="twin-orb-sg" style="width:46px;height:46px;font-size:1.1em;opacity:0.6;border-style:dashed">🔥</div>
+        <div class="node-label" style="font-size:0.6em;color:#3a6080">SG TWIN</div>
+    </div>
+
+    <div class="cloud-node" id="twin-vm" style="right:26%; bottom:17%">
+        <div class="node-orb secure" id="twin-orb-vm" style="width:46px;height:46px;font-size:1.1em;opacity:0.6;border-style:dashed">💻</div>
+        <div class="node-label" style="font-size:0.6em;color:#3a6080">VM TWIN</div>
+    </div>
+
+    <div class="cloud-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00cc66"></div>Secure</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff4444"></div>Critical drift</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff8800"></div>High drift</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ffdd00"></div>Medium drift</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#00c8ff;border-style:dashed"></div>Digital twin replica</div>
+    </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+    <div class="status-item"><div class="status-dot active"></div>Twin engine: active</div>
+    <div class="status-item"><div class="status-dot scanning"></div>Drift detection: running</div>
+    <div class="status-item" id="alert-status"><div class="status-dot active"></div>Alerts: 0 open</div>
+    <div class="status-item">Last sync: <span id="last-sync">--</span></div>
+</div>
+
+<div class="container">
+    <div class="score-card">
+        <div class="score-number green" id="score">--</div>
+        <div class="score-label">Security Posture Score</div>
+        <div class="risk-level green" id="risk-level">Scanning...</div>
+        <div class="timestamp" id="timestamp"></div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-number" id="total-resources">--</div>
+            <div class="summary-label">Resources Monitored</div>
+        </div>
+        <div class="summary-card critical">
+            <div class="summary-number" id="critical-count" style="color:#ff4444">--</div>
+            <div class="summary-label">Critical Drifts</div>
+        </div>
+        <div class="summary-card high">
+            <div class="summary-number" id="high-count" style="color:#ff8800">--</div>
+            <div class="summary-label">High Drifts</div>
+        </div>
+        <div class="summary-card medium">
+            <div class="summary-number" id="medium-count" style="color:#ffdd00">--</div>
+            <div class="summary-label">Medium Drifts</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>⚡ Simulate Attack Scenarios</h2>
+        <div class="scenario-buttons">
+            <button onclick="simulate(1)" class="btn critical">Scenario 1: S3 Public Exposure</button>
+            <button onclick="simulate(2)" class="btn critical">Scenario 2: IAM Admin Access</button>
+            <button onclick="simulate(3)" class="btn high">Scenario 3: SSH Open to All</button>
+            <button onclick="simulate(4)" class="btn critical">Scenario 4: Encryption Disabled</button>
+            <button onclick="simulate(5)" class="btn medium">Scenario 5: Monitoring Disabled</button>
+            <button onclick="simulate(0)" class="btn secure">🔄 Reset to Secure Baseline</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>🚨 Drift Alerts</h2>
+        <div id="drift-list"><p class="no-drifts">Click scan or simulate an attack to see drifts</p></div>
+    </div>
+
+    <div class="panel">
+        <button onclick="runScan()" class="btn-scan">🔍 Run Security Scan</button>
+    </div>
+</div>
+
+<script>
+// Generate stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*4}s;--bright:${0.3+Math.random()*0.7}`;
+    starsEl.appendChild(s);
+}
+
+// Draw SVG connection lines
+function drawConnections() {
+    const canvas = document.getElementById('cloudCanvas');
+    const svg = document.getElementById('connections');
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+    const center = { x: W/2, y: H/2 };
+    const nodes = {
+        s3:  { x: W*0.14, y: H*0.28 },
+        iam: { x: W*0.86, y: H*0.28 },
+        sg:  { x: W*0.14, y: H*0.72 },
+        vm:  { x: W*0.86, y: H*0.72 },
+    };
+    const twins = {
+        s3:  { x: W*0.28, y: H*0.22 },
+        iam: { x: W*0.72, y: H*0.22 },
+        sg:  { x: W*0.28, y: H*0.78 },
+        vm:  { x: W*0.72, y: H*0.78 },
+    };
+
+    let html = '';
+    const colors = { s3: '#00cc66', iam: '#00cc66', sg: '#00cc66', vm: '#00cc66' };
+    Object.keys(nodes).forEach(k => {
+        const n = nodes[k], t = twins[k];
+        html += `<line id="line-${k}" x1="${n.x}" y1="${n.y}" x2="${center.x}" y2="${center.y}" stroke="${colors[k]}" class="connection-line active"/>`;
+        html += `<line id="twin-line-${k}" x1="${t.x}" y1="${t.y}" x2="${center.x}" y2="${center.y}" stroke="#1a4a7a" class="connection-line"/>`;
+        html += `<line x1="${n.x}" y1="${n.y}" x2="${t.x}" y2="${t.y}" stroke="#0a3050" class="connection-line" style="stroke-dasharray:3,6;opacity:0.3"/>`;
+    });
+    svg.innerHTML = html;
+    window._nodePositions = { center, nodes, twins, W, H };
+}
+
+drawConnections();
+window.addEventListener('resize', drawConnections);
+
+const resourceMap = {
+    "s3-prod-data":      { key: "s3",  sev: "secure" },
+    "iam-developer-role":{ key: "iam", sev: "secure" },
+    "sg-web-server":     { key: "sg",  sev: "secure" },
+    "vm-app-server":     { key: "vm",  sev: "secure" }
+};
+
+function updateVisualization(drifts) {
+    ["s3","iam","sg","vm"].forEach(k => {
+        document.getElementById(`orb-${k}`).className = "node-orb secure";
+        document.getElementById(`twin-orb-${k}`).className = "node-orb secure";
+        document.getElementById(`twin-orb-${k}`).style.cssText = "width:46px;height:46px;font-size:1.1em;opacity:0.6;border-style:dashed";
+        document.getElementById(`badge-${k}`).className = "node-badge badge-secure";
+        document.getElementById(`badge-${k}`).textContent = "SECURE";
+        const line = document.getElementById(`line-${k}`);
+        if (line) { line.setAttribute('stroke','#00cc66'); }
+    });
+
+    drifts.forEach(d => {
+        const entry = resourceMap[d.resource_id];
+        if (!entry) return;
+        const k = entry.key;
+        const sev = d.severity.toLowerCase();
+        document.getElementById(`orb-${k}`).className = `node-orb ${sev}`;
+        document.getElementById(`twin-orb-${k}`).className = `node-orb ${sev}`;
+        document.getElementById(`twin-orb-${k}`).style.cssText = "width:46px;height:46px;font-size:1.1em;border-style:dashed;opacity:0.8";
+        document.getElementById(`badge-${k}`).className = `node-badge badge-${sev}`;
+        document.getElementById(`badge-${k}`).textContent = `⚠ ${d.severity}`;
+        const line = document.getElementById(`line-${k}`);
+        if (line) { line.setAttribute('stroke', sev==='critical'?'#ff4444':sev==='high'?'#ff8800':'#ffdd00'); }
+    });
+
+    const hub = document.getElementById('hub-score');
+    const score = parseInt(document.getElementById('score').textContent)||100;
+    hub.textContent = isNaN(score)?'--':score;
+    hub.className = `hub-score ${score>=80?'green':score>=60?'orange':'red'}`;
+
+    document.getElementById('alert-status').innerHTML =
+        `<div class="status-dot ${drifts.length?'alert':'active'}"></div>Alerts: ${drifts.length} open`;
+    document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
+}
+
+async function runScan() {
+    const r = await fetch('/api/scan');
+    const data = await r.json();
+
+    const scoreEl = document.getElementById('score');
+    scoreEl.textContent = data.score;
+    scoreEl.className = `score-number ${data.score_color}`;
+    document.getElementById('risk-level').textContent = data.risk_level;
+    document.getElementById('risk-level').className = `risk-level ${data.score_color}`;
+    document.getElementById('timestamp').textContent = `Last scan: ${data.timestamp}`;
+    document.getElementById('total-resources').textContent = data.total_resources;
+    document.getElementById('critical-count').textContent = data.severity_summary.CRITICAL;
+    document.getElementById('high-count').textContent = data.severity_summary.HIGH;
+    document.getElementById('medium-count').textContent = data.severity_summary.MEDIUM;
+
+    updateVisualization(data.drifts);
+
+    const dl = document.getElementById('drift-list');
+    if (!data.drifts.length) {
+        dl.innerHTML = '<p class="no-drifts">✅ No drifts detected — all resources secure!</p>';
+    } else {
+        dl.innerHTML = data.drifts.map(d => `
+            <div class="drift-item ${d.severity.toLowerCase()}">
+                <div class="drift-header">
+                    <span class="severity-badge ${d.severity.toLowerCase()}">${d.severity}</span>
+                    <span class="resource-id">${d.resource_id}</span>
+                    <span style="color:#2a5a7a;font-size:0.75em">${d.timestamp}</span>
+                </div>
+                <div class="drift-detail">
+                    <strong>Parameter:</strong> ${d.parameter} &nbsp;|&nbsp;
+                    <strong>Expected:</strong> ${d.expected} &nbsp;|&nbsp;
+                    <strong>Found:</strong> ${d.found}<br>
+                    <strong>Fix:</strong> ${d.remediation}
+                </div>
+            </div>`).join('');
+    }
+}
+
+async function simulate(id) {
+    await fetch(`/api/simulate/${id}`);
+    await runScan();
+}
+
+window.onload = runScan;
+setInterval(runScan, 30000);
+</script>
+</body>
+</html>

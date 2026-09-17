@@ -1,0 +1,11 @@
+{
+    "resource_type": "S3_Bucket",
+    "description": "Secure baseline for AWS S3 Bucket",
+    "parameters": {
+        "public_access": false,
+        "encryption": true,
+        "versioning": true,
+        "logging": true,
+        "ssl_enforced": true
+    }
+}

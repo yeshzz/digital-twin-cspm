@@ -1,0 +1,11 @@
+{
+    "resource_type": "Security_Group",
+    "description": "Secure baseline for AWS Security Group",
+    "parameters": {
+        "ssh_open_to_all": false,
+        "rdp_open_to_all": false,
+        "all_traffic_allowed": false,
+        "unused_ports_open": false,
+        "outbound_restricted": true
+    }
+}
