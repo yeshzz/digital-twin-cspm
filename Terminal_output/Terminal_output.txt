@@ -1,0 +1,783 @@
+ C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 1
+
+============================================================
+SCANNING: Baseline Scan - All Secure
+============================================================
+
+ POSTURE SCORE: 100/100 — SECURE
+ Drifts Found: 0
+ Critical: 0 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 0
+
+[SCENARIO 1] S3 Bucket made PUBLIC - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+
+============================================================
+SCANNING: Scenario 1 - S3 Public Exposure
+============================================================
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on s3-prod-data
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> public_access
+    Expected: False | Found: True
+    Fix: Disable public access immediately on this resource
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+[SCENARIO 2] IAM Role given ADMIN ACCESS - Critical Attack
+[DIGITAL TWIN] Resource updated: iam-developer-role
+
+============================================================
+SCANNING: Scenario 2 - IAM Admin Access
+============================================================
+[DRIFT DETECTED] iam-developer-role -> admin_access (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> least_privilege (Severity: HIGH)
+[ALERT FIRED] ALERT-002 - CRITICAL drift detected on iam-developer-role
+[ALERT FIRED] ALERT-003 - HIGH drift detected on iam-developer-role
+
+ POSTURE SCORE: 60/100 — MODERATE
+ Drifts Found: 2
+ Critical: 1 | High: 1 | Medium: 0 | Low: 0
+ Alerts Fired: 2
+
+ DRIFT DETAILS:
+  [CRITICAL] iam-developer-role -> admin_access
+    Expected: False | Found: True
+    Fix: Remove admin permissions and apply least privilege
+  [HIGH] iam-developer-role -> least_privilege
+    Expected: True | Found: False
+    Fix: Set least_privilege to True
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+
+============================================================
+SCANNING: Scenario 3 - SSH Open to All
+============================================================
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[ALERT FIRED] ALERT-004 - CRITICAL drift detected on sg-web-server
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+[SCENARIO 4] Encryption DISABLED on S3 - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+
+============================================================
+SCANNING: Scenario 4 - Encryption Disabled
+============================================================
+[DRIFT DETECTED] s3-prod-data -> encryption (Severity: CRITICAL)
+[ALERT FIRED] ALERT-005 - CRITICAL drift detected on s3-prod-data
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> encryption
+    Expected: True | Found: False
+    Fix: Enable encryption on this resource immediately
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+[SCENARIO 5] Monitoring DISABLED on VM - Medium Attack
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+============================================================
+SCANNING: Scenario 5 - Monitoring Disabled
+============================================================
+[DRIFT DETECTED] vm-app-server -> monitoring_enabled (Severity: MEDIUM)
+
+ POSTURE SCORE: 92/100 — SECURE
+ Drifts Found: 1
+ Critical: 0 | High: 0 | Medium: 1 | Low: 0
+ Alerts Fired: 0
+
+ DRIFT DETAILS:
+  [MEDIUM] vm-app-server -> monitoring_enabled
+    Expected: True | Found: False
+    Fix: Enable monitoring and alerting on this resource
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+============================================================
+SCANNING: Final Scan - All Restored
+============================================================
+
+ POSTURE SCORE: 100/100 — SECURE
+ Drifts Found: 0
+ Critical: 0 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 0
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py                    
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 2
+
+Scenarios:
+1. S3 Bucket Public Exposure
+2. IAM Admin Access
+3. SSH Open to All IPs
+4. Encryption Disabled
+5. Monitoring Disabled
+Choose scenario (1-5): 1
+
+[SCENARIO 1] S3 Bucket made PUBLIC - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+
+============================================================
+SCANNING: Scenario 1
+============================================================
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on s3-prod-data
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> public_access
+    Expected: False | Found: True
+    Fix: Disable public access immediately on this resource
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py                    
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 2
+
+Scenarios:
+1. S3 Bucket Public Exposure
+2. IAM Admin Access
+3. SSH Open to All IPs
+4. Encryption Disabled
+5. Monitoring Disabled
+Choose scenario (1-5): 2
+
+[SCENARIO 2] IAM Role given ADMIN ACCESS - Critical Attack
+[DIGITAL TWIN] Resource updated: iam-developer-role
+
+============================================================
+SCANNING: Scenario 2
+============================================================
+[DRIFT DETECTED] iam-developer-role -> admin_access (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> least_privilege (Severity: HIGH)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on iam-developer-role
+[ALERT FIRED] ALERT-002 - HIGH drift detected on iam-developer-role
+
+ POSTURE SCORE: 60/100 — MODERATE
+ Drifts Found: 2
+ Critical: 1 | High: 1 | Medium: 0 | Low: 0
+ Alerts Fired: 2
+
+ DRIFT DETAILS:
+  [CRITICAL] iam-developer-role -> admin_access
+    Expected: False | Found: True
+    Fix: Remove admin permissions and apply least privilege
+  [HIGH] iam-developer-role -> least_privilege
+    Expected: True | Found: False
+    Fix: Set least_privilege to True
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 2
+
+Scenarios:
+1. S3 Bucket Public Exposure
+2. IAM Admin Access
+3. SSH Open to All IPs
+4. Encryption Disabled
+5. Monitoring Disabled
+Choose scenario (1-5): 3
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+
+============================================================
+SCANNING: Scenario 3
+============================================================
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on sg-web-server
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 2
+
+Scenarios:
+1. S3 Bucket Public Exposure
+2. IAM Admin Access
+3. SSH Open to All IPs
+4. Encryption Disabled
+5. Monitoring Disabled
+Choose scenario (1-5): 4
+
+[SCENARIO 4] Encryption DISABLED on S3 - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+
+============================================================
+SCANNING: Scenario 4
+============================================================
+[DRIFT DETECTED] s3-prod-data -> encryption (Severity: CRITICAL)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on s3-prod-data
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> encryption
+    Expected: True | Found: False
+    Fix: Enable encryption on this resource immediately
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 5
+[FREQUENCY DETECTOR] Initialized
+[FREQUENCY DETECTOR] Threshold: 3 changes per hour
+
+[FREQ PROBE] Simulating repeated SSH configuration changes
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+  Change 1: SSH configuration toggled
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+  Change 2: SSH configuration toggled
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+  Change 3: SSH configuration toggled
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+  Change 4: SSH configuration toggled
+[FREQ ALERT] 'ssh_open_to_all' on 'sg-web-server' changed 4 times within 1 hour. Threshold: 3. Possible repeated probing behaviour.
+
+[RESULT] Frequency alerts fired: 1
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 4
+
+[CHAINED ATTACK] Running full attack sequence
+[CHAINED ATTACK] Score will be recorded after each step
+
+============================================================
+SCANNING: Chain Baseline - All Secure
+============================================================
+
+ POSTURE SCORE: 100/100 — SECURE
+ Drifts Found: 0
+ Critical: 0 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 0
+
+[CHAIN Step 1] Attacker opens SSH port - initial foothold
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+
+============================================================
+SCANNING: Chain Step 1 - SSH Open
+============================================================
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on sg-web-server
+
+ POSTURE SCORE: 75/100 — MODERATE
+ Drifts Found: 1
+ Critical: 1 | High: 0 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+
+[CHAIN Step 2] Attacker escalates IAM privileges - privilege escalation
+
+[SCENARIO 2] IAM Role given ADMIN ACCESS - Critical Attack
+[DIGITAL TWIN] Resource updated: iam-developer-role
+
+============================================================
+SCANNING: Chain Step 2 - IAM Admin Access
+============================================================
+[DRIFT DETECTED] iam-developer-role -> admin_access (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> least_privilege (Severity: HIGH)
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[ALERT FIRED] ALERT-002 - CRITICAL drift detected on iam-developer-role
+[ALERT FIRED] ALERT-003 - HIGH drift detected on iam-developer-role
+
+ POSTURE SCORE: 35/100 — CRITICAL RISK
+ Drifts Found: 3
+ Critical: 2 | High: 1 | Medium: 0 | Low: 0
+ Alerts Fired: 2
+
+ DRIFT DETAILS:
+  [CRITICAL] iam-developer-role -> admin_access
+    Expected: False | Found: True
+    Fix: Remove admin permissions and apply least privilege
+  [HIGH] iam-developer-role -> least_privilege
+    Expected: True | Found: False
+    Fix: Set least_privilege to True
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+
+[CHAIN Step 3] Attacker disables encryption - data protection weakened
+
+[SCENARIO 4] Encryption DISABLED on S3 - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+
+============================================================
+SCANNING: Chain Step 3 - Encryption Disabled
+============================================================
+[DRIFT DETECTED] s3-prod-data -> encryption (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> admin_access (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> least_privilege (Severity: HIGH)
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[ALERT FIRED] ALERT-004 - CRITICAL drift detected on s3-prod-data
+
+ POSTURE SCORE: 10/100 — CRITICAL RISK
+ Drifts Found: 4
+ Critical: 3 | High: 1 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> encryption
+    Expected: True | Found: False
+    Fix: Enable encryption on this resource immediately
+  [CRITICAL] iam-developer-role -> admin_access
+    Expected: False | Found: True
+    Fix: Remove admin permissions and apply least privilege
+  [HIGH] iam-developer-role -> least_privilege
+    Expected: True | Found: False
+    Fix: Set least_privilege to True
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+
+[CHAIN Step 4] Attacker exposes S3 - data exposure
+
+[SCENARIO 1] S3 Bucket made PUBLIC - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+
+============================================================
+SCANNING: Chain Step 4 - S3 Public Exposure
+============================================================
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+[DRIFT DETECTED] s3-prod-data -> encryption (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> admin_access (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> least_privilege (Severity: HIGH)
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[ALERT FIRED] ALERT-005 - CRITICAL drift detected on s3-prod-data
+
+ POSTURE SCORE: 0/100 — CRITICAL RISK
+ Drifts Found: 5
+ Critical: 4 | High: 1 | Medium: 0 | Low: 0
+ Alerts Fired: 1
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> public_access
+    Expected: False | Found: True
+    Fix: Disable public access immediately on this resource
+  [CRITICAL] s3-prod-data -> encryption
+    Expected: True | Found: False
+    Fix: Enable encryption on this resource immediately
+  [CRITICAL] iam-developer-role -> admin_access
+    Expected: False | Found: True
+    Fix: Remove admin permissions and apply least privilege
+  [HIGH] iam-developer-role -> least_privilege
+    Expected: True | Found: False
+    Fix: Set least_privilege to True
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+
+[CHAIN Step 5] Attacker disables monitoring - covering tracks
+
+[SCENARIO 5] Monitoring DISABLED on VM - Medium Attack
+[DIGITAL TWIN] Resource updated: vm-app-server
+
+============================================================
+SCANNING: Chain Step 5 - Monitoring Disabled
+============================================================
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+[DRIFT DETECTED] s3-prod-data -> encryption (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> admin_access (Severity: CRITICAL)
+[DRIFT DETECTED] iam-developer-role -> least_privilege (Severity: HIGH)
+[DRIFT DETECTED] sg-web-server -> ssh_open_to_all (Severity: CRITICAL)
+[DRIFT DETECTED] vm-app-server -> monitoring_enabled (Severity: MEDIUM)
+
+ POSTURE SCORE: 0/100 — CRITICAL RISK
+ Drifts Found: 6
+ Critical: 4 | High: 1 | Medium: 1 | Low: 0
+ Alerts Fired: 0
+
+ DRIFT DETAILS:
+  [CRITICAL] s3-prod-data -> public_access
+    Expected: False | Found: True
+    Fix: Disable public access immediately on this resource
+  [CRITICAL] s3-prod-data -> encryption
+    Expected: True | Found: False
+    Fix: Enable encryption on this resource immediately
+  [CRITICAL] iam-developer-role -> admin_access
+    Expected: False | Found: True
+    Fix: Remove admin permissions and apply least privilege
+  [HIGH] iam-developer-role -> least_privilege
+    Expected: True | Found: False
+    Fix: Set least_privilege to True
+  [CRITICAL] sg-web-server -> ssh_open_to_all
+    Expected: False | Found: True
+    Fix: Restrict SSH access to specific IP ranges only
+  [MEDIUM] vm-app-server -> monitoring_enabled
+    Expected: True | Found: False
+    Fix: Enable monitoring and alerting on this resource
+
+[CHAINED ATTACK] Sequence complete
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py                    
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 5
+[FREQUENCY DETECTOR] Initialized
+[FREQUENCY DETECTOR] Threshold: 3 changes per hour
+
+[FREQ PROBE] Simulating repeated SSH configuration changes
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+  Change 1: SSH configuration toggled
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+  Change 2: SSH configuration toggled
+
+[SCENARIO 3] SSH Port opened to ALL IPs - High Attack
+[DIGITAL TWIN] Resource updated: sg-web-server
+  Change 3: SSH configuration toggled
+
+[RESET] Restoring all resources to secure baseline
+[DIGITAL TWIN] Resource updated: s3-prod-data
+[DIGITAL TWIN] Resource updated: iam-developer-role
+[DIGITAL TWIN] Resource updated: sg-web-server
+[DIGITAL TWIN] Resource updated: vm-app-server
+  Change 4: SSH configuration toggled
+[FREQ ALERT] 'ssh_open_to_all' on 'sg-web-server' changed 4 times within 1 hour. Threshold: 3. Possible repeated probing behaviour.
+
+[RESULT] Frequency alerts fired: 1
+PS C:\Users\MasterRoom\Desktop\IIIT-Project\digital-twin-cspm> python main.py
+
+============================================================
+  DIGITAL TWIN — CLOUD SECURITY POSTURE & DRIFT DETECTION
+  IIIT Trichy Funded Research Project
+  Researcher: Yashaswini C
+============================================================
+[DIGITAL TWIN] Loaded 4 baseline configurations
+[DIGITAL TWIN] Initialized successfully
+[DRIFT DETECTOR] Initialized successfully
+[RISK SCORER] Initialized successfully
+[ALERT SYSTEM] Initialized successfully
+
+[SETUP] Loading cloud resources into Digital Twin...
+[DIGITAL TWIN] Resource added: s3-prod-data (S3_Bucket)
+[DIGITAL TWIN] Resource added: iam-developer-role (IAM_Role)
+[DIGITAL TWIN] Resource added: sg-web-server (Security_Group)
+[DIGITAL TWIN] Resource added: vm-app-server (VM_Instance)
+[SETUP] 4 resources loaded successfully
+
+============================================================
+SELECT MODE:
+1. Run All 5 Attack Scenarios Automatically
+2. Run Individual Scenario
+3. Launch Web Dashboard
+4. Run Chained Attack Sequence
+5. Run Frequency Probe Demo
+============================================================
+Enter choice (1/2/3/4/5): 3
+
+[DASHBOARD] Launching web dashboard...
+[DASHBOARD] Open browser and go to: http://127.0.0.1:5000
+[DASHBOARD] Press CTRL+C in terminal to stop
+ * Serving Flask app 'dashboard.app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+127.0.0.1 - - [16/Sep/2026 15:28:37] "GET /api/scan HTTP/1.1" 200 -
+127.0.0.1 - - [16/Sep/2026 15:29:26] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [16/Sep/2026 15:29:26] "GET /api/scan HTTP/1.1" 200 -
+
+[SCENARIO 1] S3 Bucket made PUBLIC - Critical Attack
+[DIGITAL TWIN] Resource updated: s3-prod-data
+127.0.0.1 - - [16/Sep/2026 15:29:36] "GET /api/simulate/1 HTTP/1.1" 200 -
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+[ALERT FIRED] ALERT-001 - CRITICAL drift detected on s3-prod-data
+127.0.0.1 - - [16/Sep/2026 15:29:36] "GET /api/scan HTTP/1.1" 200 -
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+127.0.0.1 - - [16/Sep/2026 15:29:36] "GET /api/scan HTTP/1.1" 200 -
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+127.0.0.1 - - [16/Sep/2026 15:29:56] "GET /api/scan HTTP/1.1" 200 -
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+127.0.0.1 - - [16/Sep/2026 15:30:26] "GET /api/scan HTTP/1.1" 200 -
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+127.0.0.1 - - [16/Sep/2026 15:30:36] "GET /api/scan HTTP/1.1" 200 -
+[DRIFT DETECTED] s3-prod-data -> public_access (Severity: CRITICAL)
+127.0.0.1 - - [16/Sep/2026 15:30:56] "GET /api/scan HTTP/1.1" 200 -
